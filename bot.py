@@ -6,13 +6,13 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from openai import OpenAI
 from gtts import gTTS
 import os
+import asyncio
 
 # ===== CONFIG =====
-import os
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 AFFILIATE_LINK = os.getenv("AFFILIATE_LINK")
-ADMIN_ID = os.getenv("ADMIN_ID")
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
 WHATSAPP_LINK = os.getenv("WHATSAPP_LINK")
 
 client = OpenAI(api_key=OPENAI_KEY)
@@ -102,7 +102,10 @@ async def follow_up():
 
             if diff > timedelta(hours=1) and diff < timedelta(hours=2):
                 try:
-                    await app.bot.send_message(chat_id=user_id, text="Still thinking? Start here ð\n" + AFFILIATE_LINK)
+                    await app.bot.send_message(
+                        chat_id=user_id,
+                        text="Still thinking? Start here 👇\n" + AFFILIATE_LINK
+                    )
                 except:
                     pass
 
@@ -110,7 +113,7 @@ async def follow_up():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     update_user(user.id, user.username)
-    await update.message.reply_text("Welcome ð")
+    await update.message.reply_text("Welcome 👋")
 
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -124,19 +127,22 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if intent >= 80:
         cursor.execute("UPDATE users SET hot_lead=1 WHERE user_id=?", (user.id,))
         try:
-            await context.bot.send_message(chat_id=ADMIN_ID, text=f"ð¥ HOT LEAD {user.id} - {intent}%")
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=f"🔥 HOT LEAD {user.id} - {intent}%"
+            )
         except:
             pass
 
     conn.commit()
 
     if intent >= 85:
-        await update.message.reply_text("Start here ð\n" + AFFILIATE_LINK)
+        await update.message.reply_text("Start here 👇\n" + AFFILIATE_LINK)
         return
 
     reply = await ai_reply(msg)
 
-    # Voice (female-like via tld)
+    # Voice
     tts = gTTS(reply, lang='en', tld='co.uk')
     tts.save("voice.mp3")
 
@@ -165,6 +171,11 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
 
 scheduler = AsyncIOScheduler()
 scheduler.add_job(follow_up, "interval", minutes=10)
-scheduler.start()
 
-app.run_polling()
+# ===== FIXED START =====
+async def main():
+    scheduler.start()
+    await app.run_polling()
+
+if __name__ == "__main__":
+    asyncio.run(main())
