@@ -8,11 +8,12 @@ from gtts import gTTS
 import os
 
 # ===== CONFIG =====
-BOT_TOKEN = "7990678172:AAGQ4pwZ2gwFtm6Pju-gLXIEZnB5Pkac-ls"
-OPENAI_KEY = "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"
-AFFILIATE_LINK = "https://your-affiliate-link.com"
-ADMIN_ID = 469109915
-WHATSAPP_LINK = "Authenta "
+import os
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+OPENAI_KEY = os.getenv("OPENAI_KEY")
+AFFILIATE_LINK = os.getenv("AFFILIATE_LINK")
+ADMIN_ID = os.getenv("ADMIN_ID")
+WHATSAPP_LINK = os.getenv("WHATSAPP_LINK")
 
 client = OpenAI(api_key=OPENAI_KEY)
 
