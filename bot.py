@@ -7,13 +7,25 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, filters
 from openai import OpenAI
 
 # ===== CONFIG =====
+import os
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN is missing")
+
 OPENAI_KEY = os.getenv("OPENAI_KEY")
+if not OPENAI_KEY:
+    raise ValueError("OPENAI_KEY is missing")
+
 AFFILIATE_LINK = os.getenv("AFFILIATE_LINK")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
+if not AFFILIATE_LINK:
+    raise ValueError("AFFILIATE_LINK is missing")
 
-client = OpenAI(api_key=OPENAI_KEY)
+ADMIN_ID = os.getenv("ADMIN_ID")
+if not ADMIN_ID:
+    raise ValueError("ADMIN_ID is missing")
 
+ADMIN_ID = int(ADMIN_ID)
 # ===== TELEGRAM SETUP =====
 bot = Bot(token=BOT_TOKEN)
 app = Flask(__name__)
